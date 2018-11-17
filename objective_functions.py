@@ -1,3 +1,7 @@
+#reference:
+#https://www.cs.cmu.edu/afs/cs/project/jair/pub/volume24/ortizboyer05a-html/node6.html
+#https://arxiv.org/pdf/1008.0549.pdf
+
 import math
 
 #x - vector, -30 ≤ x[i] ≤ 30
@@ -52,10 +56,10 @@ def griewank(x,n):
     for i in range(1,n+1):
         val = x[i-1]
         part1 += val**2
-        if i==0:
-            part2 += math.cos(val/math.sqrt(i+1))
+        if i==1:
+            part2 += math.cos(val/math.sqrt(i))
         else:
-            part2 *= math.cos(val/math.sqrt(i+1))
+            part2 *= math.cos(val/math.sqrt(i))
     result = (1 / 4000) * part1 - part2 + 1
     return result
 
@@ -131,7 +135,7 @@ def xin_she_yang(x,n):
         val = x[i]
         part1 += abs(val)
         part2 += math.sin(val**2)
-    result = (-part1) * math.exp(-part2)
+    result = (part1) * math.exp(-part2)
     return result
 
 # x - vector 
