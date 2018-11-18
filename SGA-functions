@@ -1,0 +1,14 @@
+import random
+
+# stringOne and stringTwo are the strings that need to perform a crossover
+# a random position is generated
+# crossover is performed at the position
+# returns the two new strings
+def performCrossover(stringOne, stringTwo, length):
+  posToCross = random.randint(0,length-1)
+
+  temp=stringOne[posToCross:]
+  stringOne = stringOne[:posToCross] + stringTwo[posToCross:]
+  stringTwo = stringTwo[:posToCross] + temp
+
+  return stringOne,stringTwo
