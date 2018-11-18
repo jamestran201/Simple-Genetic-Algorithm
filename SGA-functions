@@ -1,6 +1,7 @@
 import random
 
 # stringOne and stringTwo are the strings that need to perform a crossover
+# how many bits the strings have
 # a random position is generated
 # crossover is performed at the position
 # returns the two new strings
@@ -12,3 +13,20 @@ def performCrossover(stringOne, stringTwo, length):
   stringTwo = stringTwo[:posToCross] + temp
 
   return stringOne,stringTwo
+
+
+# length - how many bits the strings will have
+# n - how many strings to create
+# this function randomly initalizes the bits of the initial generation
+# returns the initial pool
+def initialize_strings(length, n):
+  initial_pool = []
+
+  for i in range(n):
+    new_string=''
+    for j in range(length):
+      new_string=new_string+str(random.randint(0,1))
+
+    initial_pool.append(new_string)  
+
+  return initial_pool
