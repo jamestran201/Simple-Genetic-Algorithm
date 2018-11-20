@@ -20,13 +20,15 @@ def performCrossover(stringOne, stringTwo, length):
 # this function randomly initalizes the bits of the initial generation
 # returns the initial pool
 def initialize_strings(length, n):
-  initial_pool = []
 
-  for i in range(n):
+  string_pool = []
+
+  while len(string_pool) < n:
     new_string=''
     for j in range(length):
       new_string=new_string+str(random.randint(0,1))
+    
+    if(new_string not in string_pool):
+      string_pool.append(new_string)
 
-    initial_pool.append(new_string)  
-
-  return initial_pool
+  return string_pool
