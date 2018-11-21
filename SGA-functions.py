@@ -32,3 +32,30 @@ def initialize_strings(length, n):
       string_pool.append(new_string)
 
   return string_pool
+
+def select_mut_index(string1,size):
+    turn = (random.randint(0,size-1))
+    print(turn,"turn")
+    bit=""
+    if string1[turn]=="1":
+        bit="0"
+    else:
+        bit="1"
+    new_s=""
+    if turn+1== size-1:
+        new_s=string1[0:size-1]+bit
+    else:
+        new_s=string1[0:turn]+bit+string1[turn+1:]
+    return new_s
+
+def roulette(min_values):
+    total_sum=0
+    wieghts=[]
+    
+    for i in range(len(min_values)):
+        total_sum=total_sum+min_values[i]
+    
+    for i in range(len(min_values)):
+        temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
+        wieghts.append(temp)
+    return wieghts
