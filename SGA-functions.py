@@ -19,13 +19,13 @@ def performCrossover(stringOne, stringTwo, length):
 # n - how many strings to create
 # this function randomly initalizes the bits of the initial generation
 # returns the initial pool
-def initialize_strings(length, n):
-
+def initialize_strings(dimensions_v,bits,n):
+  size=dimensions_v*bits
   string_pool = []
 
   while len(string_pool) < n:
     new_string=''
-    for j in range(length):
+    for j in range(size):
       new_string=new_string+str(random.randint(0,1))
     
     if(new_string not in string_pool):
