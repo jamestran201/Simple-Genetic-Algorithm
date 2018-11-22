@@ -59,3 +59,42 @@ def roulette(min_values):
         temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
         wieghts.append(temp)
     return wieghts
+  
+  def string_to_vector(pool,dim):
+    vect=[]
+    for i in pool:
+        start=0
+        temp= int(len(i)/dim)
+        end= temp
+        temp_l=[]
+        for j in range (dim):
+            temp_l.append(i[start:end])
+            start=end
+            end= end+temp   
+        vect.append(temp_l)
+    
+    return vect     
+def vect_to_real(vect, min_v,max_v,bits,prec):
+
+    geneE=GeneEncoder(min_v,max_v,bits,prec)
+    real_num=[]
+    for j in vect:
+        temp_l=[]
+        for x in j:
+            temp_l.append([geneE.binary_to_real(x)])
+        real_num.append(temp_l)
+    return real_num
+
+dim=8
+bits=15
+min_v=-31
+max_v=31
+prec=2
+pool=initialize_strings(dim,15,8)
+print(pool)
+vect=string_to_vector(pool,dim)
+real_n=vect_to_real(vect,min_v,max_v,bits,prec)
+
+for r in real_n:
+    print(r)
+
