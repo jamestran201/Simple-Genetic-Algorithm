@@ -1,5 +1,72 @@
+from intervaltree import IntervalTree
+from GE import GeneEncoder
+from OF import *
 import random
+def init_of(o_func):
+    sub_bits=15
+    prec=2
+    min_v=0
+    max_v=0
+    min_x=0
+    min_y=0
+    max_x=0
+    max_y=0
 
+    if (o_func !=10):
+        if (o_func !=1):
+            #1 init_ackley():
+            min_v=-(5.12)
+            max_v=(5.12)
+        elif (o_func !=2):
+            #2 init_de_jongs_sphere():
+            min_v=-(5.12)
+            max_v=(5.12)
+    
+        elif (o_func !=3):
+            #3 init_easom():
+            min_v=-2*math.pi
+            ax_v=2*math.pi
+
+        elif(o_func !=4):
+            #4 init_griewank():
+            min_v=-600
+            max_v=600
+        elif (o_func !=5):
+            #5 init_himmelblau():
+            min_v=-3.8
+            max_v=3.6
+        elif (o_func !=6):
+            #6 init_rastrigin():
+            min_v=-5.12
+            max_v=5.12
+        elif (o_func !=7):
+            #7 init_rosenbrock_var():
+            min_v=0
+            max_v=2
+        elif (o_func !=8):
+            #8 init_rosenbrock_vec():
+            min_v=-2.048
+            max_v=2.048
+        elif (o_func !=9):
+            #9 init_schwefel():
+            min_v=-65.536
+            max_v=65.536    
+        elif (o_func !=11):
+            #11 init_xin_she_yang():
+            min_v=-2*mathi.pi
+            max_v=2*math.pi    
+        #12 init_zakharov():
+        elif (o_func !=12):
+            min_v=0
+            max_v=1
+    else:
+        #10 init_six_hump_camel_back()
+        min_y=-2
+        max_y=2
+        min_x=-3
+        max_x=3
+
+    return sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y
 # stringOne and stringTwo are the strings that need to perform a crossover
 # how many bits the strings have
 # a random position is generated
@@ -58,11 +125,31 @@ def roulette(min_values):
     for i in range(len(min_values)):
         temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
         wieghts.append(temp)
-    return wieghts
-  
-  def string_to_vector(pool,dim):
-    vect=[]
-    for i in pool:
+    return wieght
+  def weights_tree(min_values):
+    total_sum=0
+    weights=[]
+    tree = IntervalTree()
+
+    for i in range(len(min_values)):
+        total_sum=total_sum+min_values[i]
+    
+    for i in range(len(min_values)):
+        temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
+        weights.append(temp)
+
+    start= 0
+    end =0
+    for i in range(len(min_values)):
+        end = start+weights[i]
+
+        tree[start:end]= i
+        start= end 
+
+    return tree
+def string_to_vector(pool,dim):
+  vect=[]
+  for i in pool:
         start=0
         temp= int(len(i)/dim)
         end= temp
@@ -73,7 +160,81 @@ def roulette(min_values):
             end= end+temp   
         vect.append(temp_l)
     
-    return vect     
+   return vect    
+def obective_function(o_func,real_n):
+    min_values=[]
+    if (o_func !=10):
+        if (o_func !=1):
+            #1 init_ackley():
+            for i in range(len(real_n)):
+                min_values.append(ackley(real_n[i],dim))
+        elif (o_func !=2):
+            #2 init_de_jongs_sphere():
+            for i in range(len(real_n)):
+                min_values.append(de_jongs_sphere(real_n[i],dim))  
+        elif (o_func !=3):
+            #3 init_easom():
+            for i in range(len(real_n)):
+                min_values.append(easom(real_n[i],dim))
+
+        elif(o_func !=4):
+            #4 init_griewank():
+            for i in range(len(real_n)):
+                min_values.append(griewank(real_n[i],dim))
+        elif (o_func !=6):
+            #6 init_rastrigin():
+            for i in range(len(real_n)):
+                min_values.append(rastrigin(real_n[i],dim))
+        elif (o_func !=7):
+            #7 init_rosenbrock_var():
+            #x,y - two real-valued variables
+            #min at a,a^2 = 0
+            #def rosenbrock_var(x,y):
+            #a & b are parameters of the function
+            #a = 1
+            #b = 100
+            #result = (a - x)**2 + b*(y-x**2)**2
+            #return result
+            continue
+        elif (o_func !=8):
+            #8 init_rosenbrock_vec():
+            for i in range(len(real_n)):
+                min_values.append(rosenbrock_vec(real_n[i],dim))
+        elif (o_func !=9):
+            #9 init_schwefel():
+            for i in range(len(real_n)):
+                min_values.append(schwefel(real_n[i],dim))
+        elif (o_func !=11):
+            #11 init_xin_she_yang():
+            for i in range(len(real_n)):
+                min_values.append(xin_she_yang(real_n[i],dim))   
+        #12 init_zakharov():
+        elif (o_func !=12):
+            for i in range(len(real_n)):
+                min_values.append(zakharov(real_n[i],dim))
+    elif (o_func !=5):
+        #5 init_himmelblau():
+        #x,y - two real-valued variables
+        #mins at:
+        #f(3.0,2.0)=0
+        #f(-2.805118,3.131312)=0
+        #f(-3.779310,-3.283186)=0
+        #f(3.584428,-1.848126)=0
+        #def himmelblau(x,y):
+    #    result = (x**2 + y - 11)**2 + (x + y**2-7)**2
+    #    return result
+        continue
+    else:
+        #10 init_six_hump_camel_back()
+        #x,y - real numbers −3 ≤ x ≤ 3 and −2 ≤ y ≤ 2
+        #min at (0.0898, −0.7126) and (−0.0898, 0.7126) =  −1.0316
+        #def six_hump_camel_back(x,y):
+        #result = (4 - 2.1 * x**2 + (1/3) * x**4) * x**2 + x * y + 4 * (y**2 - 1) * y**2
+        #return result
+        continue
+
+    return min_values
+  
 def vect_to_real(vect, min_v,max_v,bits,prec):
 
     geneE=GeneEncoder(min_v,max_v,bits,prec)
@@ -85,16 +246,56 @@ def vect_to_real(vect, min_v,max_v,bits,prec):
         real_num.append(temp_l)
     return real_num
 
-dim=8
-bits=15
-min_v=-31
-max_v=31
-prec=2
-pool=initialize_strings(dim,15,8)
-print(pool)
-vect=string_to_vector(pool,dim)
-real_n=vect_to_real(vect,min_v,max_v,bits,prec)
+def main():
+    #dim =8
+    min_values=[]
+    pool_s= int (input("Enter the Pool size:"))
+    print("1 init_ackley()")
+    print("2 init_de_jongs_sphere()")
+    print("3 init_easom()")
+    print("4 init_griewank()")
+    print("5 init_himmelblau()")
+    print("6 init_rastrigin()")
+    print("7 init_rosenbrock_var()")
+    print("8 init_rosenbrock_vec()")
+    print("9 init_schwefel()")
+    print("10 init_six_hump_camel_back()")
+    print("11 init_xin_she_yang()")
+    print("12 init_zakharov()")
+    o_func= int(input("Enter the number of the objective function you want to use:"))
+    dim=int(input("Enter the Obective Functions Dimensions:"))
 
-for r in real_n:
-    print(r)
+    sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
 
+    pool=initialize_strings(dim,sub_bits,8)
+    print(pool)
+    
+    no_change=0
+    while no_change!=3:
+        vect=string_to_vector(pool,dim)
+        real_n=vect_to_real(vect,min_v,max_v,sub_bits,prec)
+
+        min_values=obective_function(o_func,real_n)    
+        # calling function to do interval tree to find 
+        tree= weights_tree(min_values)
+        cross_check=False 
+        index_s1= random.random(0.0,1.0)
+        index_s2=random.random(0.0,1.0)
+        string_1=pool[tree[index_s1]]
+        string_2=pool[tree[index_s2]]
+        # crossover 
+        pool[tree[index_s1]],pool[tree[index_s2]]=performCrossover(string_1,string_2, len(string_1))
+        if (string_1 !=pool[tree[index_s1]]) or (string_2!=pool[tree[index_s2]]):
+            cross_check=True
+        # mutation
+        mut_check= False
+        mut_index=random.randon(0.0,1.0)
+        mut_string=pool[tree[mut_index]]
+        pool[tree[mut_index]]=select_mut_index(mut_string,len(mut_string))
+        if (mut_string !=pool[tree[mut_index]]):
+            mut_check=True
+    
+        if (mut_check == False) and (cross_check==False):
+            no_change=no_change+1:
+    return 
+main()
