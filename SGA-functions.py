@@ -292,9 +292,8 @@ def main():
     for i in range(pool_s):
         prob = random.random()
         if (prob <= mut_p):
-            c = list(tree.search(i))[0]
-            mut_string=pool[c[2]]
-            pool[c[2]]=select_mut_index(mut_string,len(mut_string),max_v,min_v,sub_bits,prec)
+            temp=pool[i]
+            pool[i]=select_mut_index(temp,sub_bits,max_v,min_v,sub_bits,prec)
     print(pool)
     return 
 main()
