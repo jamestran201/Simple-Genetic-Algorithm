@@ -293,7 +293,7 @@ def main():
         prob = random.random()
         if (prob <= mut_p):
             temp=pool[i]
-            pool[i]=select_mut_index(temp,sub_bits,max_v,min_v,sub_bits,prec)
+            pool[i]=select_mut_index(temp,sub_bits,max_v,min_v,(sub_bits*dim),prec)
     print(pool)
     return 
 main()
