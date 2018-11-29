@@ -157,3 +157,12 @@ class GeneEncoder:
         binary_str = self.gray_to_binary(gray_str)
         value = self.binary_to_real(binary_str)
         return value
+    def binary_to_bipolar(self,string ):
+        result=[]
+        for s in string:
+            if s == "0":
+                result.append(-1)
+            else:
+                result.append(1)
+    
+        return result
