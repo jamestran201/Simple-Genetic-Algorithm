@@ -82,6 +82,20 @@ def performCrossover(stringOne, stringTwo, length):
 
   return stringOne,stringTwo
 
+def crossover_multivar(gene_1, gene_2, length):
+    posToCross = random.randint(0,length-1)
+
+    new_gene_1 = []
+    new_gene_2 = []
+    for subgene_1, subgene_2 in zip(gene_1, gene_2):
+        temp = subgene_1[posToCross:]
+        stringOne = subgene_1[:posToCross] + subgene_2[posToCross:]
+        stringTwo = subgene_2[:posToCross] + temp
+
+        new_gene_1.append(stringOne)
+        new_gene_2.append(stringTwo)
+        
+    return new_gene_1, new_gene_2
 
 # length - how many bits the strings will have
 # n - how many strings to create
@@ -100,6 +114,23 @@ def initialize_strings(dimensions_v,bits,n):
         if(new_string not in string_pool):
             string_pool.append(new_string)
     return string_pool
+
+def initialize_strings_no_concat(dimensions_v,bits,n):
+    #size = int(dimensions_v*(math.ceil(math.log(length_r,2))))
+    string_pool = []
+    print("Number of variables: {}".format(dimensions_v))
+    while len(string_pool) < n:
+        new_gene = []
+        for j in range(dimensions_v):
+            new_string=''
+            for i in range(bits):
+                new_string=new_string+str(random.randint(0,1))
+            new_gene.append(new_string)
+    
+        if(new_gene not in string_pool):
+            string_pool.append(new_gene)
+    return string_pool
+
 def select_mut_index(string1,size,max_v,min_v,sub_bits,prec):
     binary_g=GeneEncoder(min_v,max_v,size,prec)
     val=binary_g.binary_to_gray(string1)
@@ -119,25 +150,55 @@ def select_mut_index(string1,size,max_v,min_v,sub_bits,prec):
 
     return final_r
 
+def mutate_multi_var(gene, max_v, min_v, sub_bits, prec):
+    binary_g = GeneEncoder(min_v, max_v, sub_bits, prec)
+    subgene_index = random.randint(0, len(gene)-1)
+    
+    val = binary_g.binary_to_gray(gene[subgene_index])
+    turn = (random.randint(0, sub_bits-1))
+    bit = ""
+    if val[turn] == "1":
+        bit="0"
+    else:
+        bit="1"
+
+    new_s = ""
+    if turn+1 == sub_bits:
+        new_s = val[0:sub_bits-1] + bit
+    else:
+        new_s = val[0:turn] + bit + val[turn+1:]
+
+    gene[subgene_index] = binary_g.gray_to_binary(new_s)
+
+    return gene
+
 def weights_tree(min_values):
     total_sum=0
     weights=[]
     tree = IntervalTree()
 
+    # for i in range(len(min_values)):
+    #     total_sum=total_sum+min_values[i]
+    
+    # for i in range(len(min_values)):
+    #     temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
+    #     weights.append(temp)
+
     for i in range(len(min_values)):
-        total_sum=total_sum+min_values[i]
+        total_sum = total_sum + math.exp(-1 * min_values[i])
     
     for i in range(len(min_values)):
-        temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
+        temp = math.exp(-1 * min_values[i]) / total_sum
         weights.append(temp)
 
     start= 0
     end =0
     for i in range(len(min_values)):
-        end = start+weights[i]
+        if weights[i] - 0 > 0.0000000001:
+            end = start+weights[i]
 
-        tree[start:end]= i
-        start= end 
+            tree[start:end]= i
+            start= end 
 
     return tree
 
@@ -226,7 +287,7 @@ def vect_to_real(vect, min_v,max_v,sub_bits,prec):
     return real_num
 def main():
     #dim =8
-    max_iteration= 100000
+    max_iteration= 10000
     min_values=[]
     pool_s= int (input("Enter the Pool size:"))
     print("1 init_ackley()")
@@ -244,17 +305,21 @@ def main():
     o_func= int(input("Enter the number of the objective function you want to use:"))
     dim=int(input("Enter the Obective Functions Dimensions:"))
     mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
-    pool=initialize_strings(dim,sub_bits,pool_s)
+    # pool=initialize_strings_no_concat(dim,sub_bits,pool_s)
+    pool = initialize_strings(dim,sub_bits,pool_s)
+    print("First generation pool:")
     print(pool)
+    print()
     
     min_obj_value = None
-    threshold = 0.00001
+    threshold = 0.0001
     no_change=0
     iteration=0
     print("Max iteration: {}".format(max_iteration))
-    while no_change!=3 and iteration < max_iteration:
+    while no_change < 100 and iteration < max_iteration:
         print("Iteration: {}, min_obj_value: {}".format(iteration, min_obj_value))
         new_pool=[]
+
         if (o_func==10 or o_func==5 or o_func==7 ):
             vect= string_to_vector(pool,2)
             real_n=vect_to_real(vect,min_v,max_v,(sub_bits*dim)//2,prec)
@@ -262,16 +327,19 @@ def main():
             vect=string_to_vector(pool,dim)
             real_n=vect_to_real(vect,min_v,max_v,sub_bits,prec)
         
+        # real_n = vect_to_real(pool, min_v, max_v, sub_bits, prec)
+
         min_values=obective_function(o_func,real_n,dim)
-        current_min = min(min_values)
+        current_min_value = min(min_values)
+        print("Iteration min value: {}".format(current_min_value))
+
         if min_obj_value is None:
-            min_obj_value = current_min
-        elif min_obj_value > current_min:
-            if (min_obj_value - current_min) < threshold:
-                no_change += 1
-            else:
-                min_obj_value = current_min
-                no_change = 0
+            min_obj_value = current_min_value
+        elif abs(min_obj_value - current_min_value) < threshold or current_min_value > min_obj_value:
+            no_change += 1
+        else:
+            min_obj_value = current_min_value
+            no_change = 0
 
         # calling function to do interval tree to find 
         tree= weights_tree(min_values)    
@@ -281,7 +349,7 @@ def main():
             index_s1= random.random()
             get_index=list(tree.search(index_s1))[0]
             index_of_temp_pool.append(get_index[2])
-        
+
         # crossover 
         for c in range(pool_s//2):
             a= random.randint(0,len(index_of_temp_pool)-1)
@@ -293,7 +361,20 @@ def main():
             temp1,temp2=performCrossover(string_1,string_2, len(string_1))
             new_pool.append(temp1)
             new_pool.append(temp2)
-        pool=new_pool    
+        pool=new_pool
+
+        # for c in range(pool_s // 2):
+        #     a = random.randint(0,len(index_of_temp_pool)-1)
+        #     gene_1 = pool[index_of_temp_pool.pop(a)]
+
+        #     b = random.randint(0,len(index_of_temp_pool)-1)
+        #     gene_2 = pool[index_of_temp_pool.pop(b)]
+
+        #     temp1,temp2 = crossover_multivar(gene_1, gene_2, len(gene_1[0]))
+        #     new_pool.append(temp1)
+        #     new_pool.append(temp2)
+
+        # pool=new_pool
 
         # mutation
         for i in range(pool_s):
@@ -301,11 +382,18 @@ def main():
             if (prob <= mut_p ):
                 temp=pool[i]
                 pool[i]=select_mut_index(temp,(sub_bits*dim),max_v,min_v,sub_bits,prec)
+
+        # for i in range(pool_s):
+        #     prob = random.random()
+        #     if (prob <= mut_p) :
+        #         pool[i] = mutate_multi_var(pool[i], max_v, min_v, sub_bits, prec)
+
         iteration+=1 
-    print(real_n,"real_n")
-    print(min_values,"min_values")     
-    print(pool)
+
+        print()
+
     print(min_obj_value)
+
     return 
 
 main()
