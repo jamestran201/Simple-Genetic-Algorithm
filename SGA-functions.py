@@ -40,15 +40,15 @@ def init_of(o_func):
         elif (o_func ==5):
             #5 init_himmelblau():
             min_v=-3.8
-            max_v=3.6
+            max_v=3.8
         elif (o_func ==6):
             #6 init_rastrigin():
             min_v=-5.12
             max_v=5.12
         elif (o_func ==7):
             #7 init_rosenbrock_var():
-            min_v=0
-            max_v=2
+            min_v=-2.048
+            max_v=2.048
         elif (o_func ==8):
             #8 init_rosenbrock_vec():
             min_v=-2.048
@@ -246,7 +246,7 @@ def obective_function(o_func,real_n,dim):
     elif (o_func ==5):
         #5 init_himmelblau():
         for i in range(len(real_n)):
-            min_values.append(himmelblau(real_n[0],real_n[1]))
+            min_values.append(himmelblau(real_n[i][0],real_n[i][1]))
     elif (o_func ==6):
         #6 init_rastrigin():
         for i in range(len(real_n)):
@@ -254,7 +254,7 @@ def obective_function(o_func,real_n,dim):
     elif (o_func ==7):
             #7 init_rosenbrock_var():
         for i in range(len(real_n)):
-            min_values.append(rosenbrock_var(real_n[0],real_n[1]))
+            min_values.append(rosenbrock_var(real_n[i][0],real_n[i][1]))
             
     elif (o_func ==8):
         #8 init_rosenbrock_vec():
@@ -294,7 +294,7 @@ def main():
     #dim =8
     max_iteration= 10000
     min_values=[]
-    pool_s= int (input("Enter the Pool size:"))
+    pool_s= int (input("Enter the Pool size: "))
     print("1 init_ackley()")
     print("2 init_de_jongs_sphere()")
     print("3 init_easom()")
@@ -307,12 +307,17 @@ def main():
     print("10 init_six_hump_camel_back()")
     print("11 init_xin_she_yang()")
     print("12 init_zakharov()")
-    o_func= int(input("Enter the number of the objective function you want to use:"))
-    dim=int(input("Enter the Obective Functions Dimensions:"))
+    o_func= int(input("Enter the number of the objective function you want to use: "))
+
+    if (o_func == 5) or (o_func == 7):
+        # TODO: Determine what this should be after
+        dim = 2
+    else:
+        dim=int(input("Enter the Obective Functions Dimensions: "))
+
     mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
     # pool=initialize_strings_no_concat(dim,sub_bits,pool_s)
     pool = initialize_strings(dim,sub_bits,pool_s)
-    print("First generation pool:")
     print(pool)
     print()
     
