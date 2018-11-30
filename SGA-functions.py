@@ -1,6 +1,8 @@
 from intervaltree import IntervalTree
 from encoder import GeneEncoder
 from objective_functions import *
+from output import *
+from datetime import datetime
 import random
 import math 
 # stringOne and stringTwo are the strings that need to perform a crossover
@@ -323,6 +325,8 @@ def main():
     
     best_obj_value = None
     best_gene = None
+    avg_obj_value_per_gen = []
+    min_obj_value_per_gen = []
     threshold = 0.0001
     max_no_change = 100
     no_change=0
@@ -343,6 +347,9 @@ def main():
 
         min_values=obective_function(o_func,real_n,dim)
         current_min_value = min(min_values)
+        min_obj_value_per_gen.append(current_min_value)
+        avg_obj_value_per_gen.append(sum(min_values) / pool_s)
+
         print("Iteration min value: {}".format(current_min_value))
 
         if best_obj_value is None:
@@ -415,10 +422,38 @@ def main():
     print("The algorithm stopped after {} iterations".format(iteration))
     print("Reason for stopping: ", end = "")
 
+    stop_reason = ""
     if iteration == max_iteration:
-        print("maximum number of iteration reached")
+        stop_reason = "maximum number of iteration reached"
     else:
-        print("stopped early because the best objective value only changes slightly after {} iterations".format(max_no_change))
+        stop_reason = "stopped early because the best objective value only changes slightly after {} iterations".format(max_no_change)
+    print(stop_reason)
+
+    current_time = datetime.now()
+    plot_line_graph([i for i in range(iteration)], avg_obj_value_per_gen, "Generation", "Average fitness value",\
+                    "Average fitness value per generation", current_time)
+    
+    plot_line_graph([i for i in range(iteration)], [math.log10(i + 0.0001) for i in avg_obj_value_per_gen], "Generation", "log(Average fitness value)",\
+                    "log(Average fitness value) per generation", current_time)
+    
+    plot_line_graph([i for i in range(iteration)], min_obj_value_per_gen, "Generation", "Minimum fitness value",\
+                    "Minimum fitness value per generation", current_time)
+    
+    plot_line_graph([i for i in range(iteration)], [math.log10(i + 0.0001) for i in min_obj_value_per_gen], "Generation", "log(Minimum fitness value)",\
+                    "log(Minimum fitness value) per generation", current_time)
+
+    result_dict = {
+        "obj_func" : o_func,
+        "obj_dimen" : dim,
+        "pool_size" : pool_s,
+        "mutate_prob" : mut_p,
+        "max_iter" : max_iteration,
+        "best_obj_value" : best_obj_value,
+        "best_gene": best_gene,
+        "stop_iter" : iteration,
+        "stop_reason" : stop_reason
+    }
+    save_result_to_file(result_dict, current_time)
 
     return 
 
