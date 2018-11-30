@@ -321,13 +321,15 @@ def main():
     print(pool)
     print()
     
-    min_obj_value = None
+    best_obj_value = None
+    best_gene = None
     threshold = 0.0001
+    max_no_change = 100
     no_change=0
     iteration=0
     print("Max iteration: {}".format(max_iteration))
-    while no_change < 100 and iteration < max_iteration:
-        print("Iteration: {}, min_obj_value: {}".format(iteration, min_obj_value))
+    while no_change < max_no_change and iteration < max_iteration:
+        print("Iteration: {}, best_obj_value: {}".format(iteration, best_obj_value))
         new_pool=[]
 
         if (o_func==10 or o_func==5 or o_func==7 ):
@@ -343,12 +345,16 @@ def main():
         current_min_value = min(min_values)
         print("Iteration min value: {}".format(current_min_value))
 
-        if min_obj_value is None:
-            min_obj_value = current_min_value
-        elif abs(min_obj_value - current_min_value) < threshold or current_min_value > min_obj_value:
+        if best_obj_value is None:
+            best_obj_value = current_min_value
+            best_val_index = min_values.index(best_obj_value)
+            best_gene = real_n[best_val_index]
+        elif abs(best_obj_value - current_min_value) < threshold or current_min_value > best_obj_value:
             no_change += 1
         else:
-            min_obj_value = current_min_value
+            best_obj_value = current_min_value
+            best_val_index = min_values.index(best_obj_value)
+            best_gene = real_n[best_val_index]
             no_change = 0
 
         # calling function to do interval tree to find 
@@ -402,7 +408,17 @@ def main():
 
         print()
 
-    print(min_obj_value)
+    print("Best objective value found: {:.3f}".format(best_obj_value))
+    print("Best input values found:")
+    print(best_gene)
+    print()
+    print("The algorithm stopped after {} iterations".format(iteration))
+    print("Reason for stopping: ", end = "")
+
+    if iteration == max_iteration:
+        print("maximum number of iteration reached")
+    else:
+        print("stopped early because the best objective value only changes slightly after {} iterations".format(max_no_change))
 
     return 
 
