@@ -184,11 +184,16 @@ def weights_tree(min_values):
     #     temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
     #     weights.append(temp)
 
-    for i in range(len(min_values)):
-        total_sum = total_sum + math.exp(-1 * min_values[i])
+    shifted_values = []
+    max_val = min(min_values)
+    for val in min_values:
+        shifted_values.append(val - max_val)
+
+    for i in range(len(shifted_values)):
+        total_sum = total_sum + math.exp(-1 * shifted_values[i])
     
-    for i in range(len(min_values)):
-        temp = math.exp(-1 * min_values[i]) / total_sum
+    for i in range(len(shifted_values)):
+        temp = math.exp(-1 * shifted_values[i]) / total_sum
         weights.append(temp)
 
     start= 0
