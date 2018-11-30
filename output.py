@@ -4,20 +4,12 @@ from datetime import datetime
 
 RESULTS_DIR = "results/"
 
-TEST_FUNCTIONS = {
-    1: "Ackley",
-    2: "De Jong Sphere",
-    3: "Easom",
-    4: "Griewank",
-    5: "Himmelblau",
-    6: "Rastrigin",
-    7: "Rosenbrock",
-    8: "Rosenbrock",
-    9: "Schwefel",
-    10: "Six Hump Camel Back",
-    11: "Xin She Yang",
-    12: "Zakharov"
-}
+TEST_FUNCTIONS = [
+    "Ackley", "De Jong Sphere", "Easom", "Griewank", "Himmelblau", "Rastrigin", "Rosenbrock",
+    "Rosenbrock", "Schwefel", "Six Hump Camel Back", "Xin She Yang", "Zakharov", "f10", "f11",
+    "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23", "f24",
+    "f25", "f26", "f27"
+]
 
 def plot_line_graph(x, y, xlabel, ylabel, plot_title, timestamp):
     plt.plot(x, y)
@@ -60,7 +52,7 @@ def save_result_to_file(result_dict, timestamp):
         pass
 
     with open(output_dir + "/" + "summary.txt", "w") as f:
-        f.write("Objective function: {}\n".format(TEST_FUNCTIONS[result_dict["obj_func"]]))
+        f.write("Objective function: {}\n".format(TEST_FUNCTIONS[result_dict["obj_func"] - 1]))
         f.write("Dimension of objective function: {}\n".format(result_dict["obj_dimen"]))
         f.write("Pool size: {}\n".format(result_dict["pool_size"]))
         f.write("Mutation probability: {}\n".format(result_dict["mutate_prob"]))

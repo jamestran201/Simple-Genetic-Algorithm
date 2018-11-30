@@ -1,6 +1,7 @@
 from intervaltree import IntervalTree
-from encoder import GeneEncoder
+from encoder import *
 from objective_functions import *
+from new_of import *
 from output import *
 from datetime import datetime
 import random
@@ -19,60 +20,61 @@ def init_of(o_func):
     min_y=0
     max_x=0
     max_y=0
-    mut_p=0.01
-    if (o_func !=10): 
-        if (o_func ==1):
-            #1 init_ackley():
-            min_v=-(5.12)
-            max_v=(5.12)
-        elif (o_func ==2):
-            #2 init_de_jongs_sphere():
-            min_v=-(5.12)
-            max_v=(5.12)
-    
-        elif (o_func ==3):
-            #3 init_easom():
-            min_v=-2*math.pi
-            ax_v=2*math.pi
+    mut_p=0.001
+    if (o_func ==1):
+        #1 init_ackley():
+        min_v=-(5.12)
+        max_v=(5.12)
+    elif (o_func ==2):
+        #2 init_de_jongs_sphere():
+        min_v=-(5.12)
+        max_v=(5.12)
 
-        elif(o_func==4):
-            #4 init_griewank():
-            min_v=-600
-            max_v=600
-        elif (o_func ==5):
-            #5 init_himmelblau():
-            min_v=-3.8
-            max_v=3.8
-        elif (o_func ==6):
-            #6 init_rastrigin():
-            min_v=-5.12
-            max_v=5.12
-        elif (o_func ==7):
-            #7 init_rosenbrock_var():
-            min_v=-2.048
-            max_v=2.048
-        elif (o_func ==8):
-            #8 init_rosenbrock_vec():
-            min_v=-2.048
-            max_v=2.048
-        elif (o_func ==9):
-            #9 init_schwefel():
-            min_v=-65.536
-            max_v=65.536    
-        elif (o_func==11):
-            #11 init_xin_she_yang():
-            min_v=-2*math.pi
-            max_v=2*math.pi    
-        #12 init_zakharov():
-        elif (o_func ==12):
-            min_v=0
-            max_v=1
-    else:
+    elif (o_func ==3):
+        #3 init_easom():
+        min_v=-2*math.pi
+        max_v=2*math.pi
+
+    elif(o_func==4):
+        #4 init_griewank():
+        min_v=-600
+        max_v=600
+    elif (o_func ==5):
+        #5 init_himmelblau():
+        min_v=-3.8
+        max_v=3.8
+    elif (o_func ==6):
+        #6 init_rastrigin():
+        min_v=-5.12
+        max_v=5.12
+    elif (o_func ==7):
+        #7 init_rosenbrock_var():
+        min_v=-2.048
+        max_v=2.048
+    elif (o_func ==8):
+        #8 init_rosenbrock_vec():
+        min_v=-2.048
+        max_v=2.048
+    elif (o_func ==9):
+        #9 init_schwefel():
+        min_v=-65.536
+        max_v=65.536
+    elif (o_func == 10):
         #10 init_six_hump_camel_back()
         min_y=-2
         max_y=2
         min_x=-3
         max_x=3
+    elif (o_func==11):
+        #11 init_xin_she_yang():
+        min_v=-2*math.pi
+        max_v=2*math.pi    
+    #12 init_zakharov():
+    elif (o_func ==12):
+        min_v=0
+        max_v=1
+    elif (o_func >= 13) and (o_func <= 30):
+        sub_bits = 1
 
     return mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y
 def performCrossover(stringOne, stringTwo, length):
@@ -83,21 +85,6 @@ def performCrossover(stringOne, stringTwo, length):
   stringTwo = stringTwo[:posToCross] + temp
 
   return stringOne,stringTwo
-
-def crossover_multivar(gene_1, gene_2, length):
-    posToCross = random.randint(0,length-1)
-
-    new_gene_1 = []
-    new_gene_2 = []
-    for subgene_1, subgene_2 in zip(gene_1, gene_2):
-        temp = subgene_1[posToCross:]
-        stringOne = subgene_1[:posToCross] + subgene_2[posToCross:]
-        stringTwo = subgene_2[:posToCross] + temp
-
-        new_gene_1.append(stringOne)
-        new_gene_2.append(stringTwo)
-        
-    return new_gene_1, new_gene_2
 
 # length - how many bits the strings will have
 # n - how many strings to create
@@ -117,25 +104,13 @@ def initialize_strings(dimensions_v,bits,n):
             string_pool.append(new_string)
     return string_pool
 
-def initialize_strings_no_concat(dimensions_v,bits,n):
-    #size = int(dimensions_v*(math.ceil(math.log(length_r,2))))
-    string_pool = []
-    print("Number of variables: {}".format(dimensions_v))
-    while len(string_pool) < n:
-        new_gene = []
-        for j in range(dimensions_v):
-            new_string=''
-            for i in range(bits):
-                new_string=new_string+str(random.randint(0,1))
-            new_gene.append(new_string)
-    
-        if(new_gene not in string_pool):
-            string_pool.append(new_gene)
-    return string_pool
+def select_mut_index(string1,size,max_v,min_v,sub_bits,prec,discrete_mode):
+    if not discrete_mode:
+        binary_g=GeneEncoder(min_v,max_v,size,prec)
+        val=binary_g.binary_to_gray(string1)
+    else:
+        val = string1
 
-def select_mut_index(string1,size,max_v,min_v,sub_bits,prec):
-    binary_g=GeneEncoder(min_v,max_v,size,prec)
-    val=binary_g.binary_to_gray(string1)
     turn = (random.randint(0,size-1))
     
     bit=""
@@ -148,31 +123,13 @@ def select_mut_index(string1,size,max_v,min_v,sub_bits,prec):
         new_s=val[0:size-1]+bit
     else:
         new_s=val[0:turn]+bit+val[turn+1:]
-    final_r= binary_g.gray_to_binary(new_s)
+    
+    if not discrete_mode:
+        final_r= binary_g.gray_to_binary(new_s)
+    else:
+        final_r = new_s
 
     return final_r
-
-def mutate_multi_var(gene, max_v, min_v, sub_bits, prec):
-    binary_g = GeneEncoder(min_v, max_v, sub_bits, prec)
-    subgene_index = random.randint(0, len(gene)-1)
-    
-    val = binary_g.binary_to_gray(gene[subgene_index])
-    turn = (random.randint(0, sub_bits-1))
-    bit = ""
-    if val[turn] == "1":
-        bit="0"
-    else:
-        bit="1"
-
-    new_s = ""
-    if turn+1 == sub_bits:
-        new_s = val[0:sub_bits-1] + bit
-    else:
-        new_s = val[0:turn] + bit + val[turn+1:]
-
-    gene[subgene_index] = binary_g.gray_to_binary(new_s)
-
-    return gene
 
 def weights_tree(min_values):
     total_sum=0
@@ -223,66 +180,28 @@ def string_to_vector(pool,dim):
         vect.append(temp_l)
     
     return vect     
-def obective_function(o_func,real_n,dim):
+def objective_function(o_func,real_n,dim):
+    func_ptr = [ackley, de_jongs_sphere, easom, griewank, himmelblau, rastrigin, rosenbrock_var, rosenbrock_vec,
+                schwefel, six_hump_camel_back, xin_she_yang, zakharov, f10, f11, f12, f13, f14, f15, f16, f17,
+                f18, f19, f20, f21, f22, f23, f24, f25, f26, f27]
     min_values=[]
-    
-    if (o_func ==1):
-         #1 init_ackley():
-        for i in range(len(real_n)):
-            # print(real_n[i],"real_n[i]")
-            min_values.append(ackley(real_n[i],dim))
+    chosen_func = func_ptr[o_func - 1]
 
-    elif (o_func ==2):
-            #2 init_de_jongs_sphere():
+    if (o_func >= 13) and (o_func <= 30):
+        # Custom functions in new_of
         for i in range(len(real_n)):
-            min_values.append(de_jongs_sphere(real_n[i],dim))  
-    elif (o_func ==3):
-            #3 init_easom():
+            min_values.append(chosen_func(real_n[i]))
+    elif o_func in [5, 7, 10]:
+        # Himmelblau, Rosenbrock single and multi-variable
         for i in range(len(real_n)):
-            min_values.append(easom(real_n[i],dim))
-
-    elif(o_func ==4):
-        #4 init_griewank():
-        for i in range(len(real_n)):
-            min_values.append(griewank(real_n[i],dim))
-    elif (o_func ==5):
-        #5 init_himmelblau():
-        for i in range(len(real_n)):
-            min_values.append(himmelblau(real_n[i][0],real_n[i][1]))
-    elif (o_func ==6):
-        #6 init_rastrigin():
-        for i in range(len(real_n)):
-            min_values.append(rastrigin(real_n[i],dim))
-    elif (o_func ==7):
-            #7 init_rosenbrock_var():
-        for i in range(len(real_n)):
-            min_values.append(rosenbrock_var(real_n[i][0],real_n[i][1]))
-            
-    elif (o_func ==8):
-        #8 init_rosenbrock_vec():
-        for i in range(len(real_n)):
-            min_values.append(rosenbrock_vec(real_n[i],dim))
-    elif (o_func ==9):
-            #9 init_schwefel():
-        for i in range(len(real_n)):
-            min_values.append(schwefel(real_n[i],dim))
-    elif (o_func ==11):
-            #11 init_xin_she_yang():
-        for i in range(len(real_n)):
-            min_values.append(xin_she_yang(real_n[i],dim))   
-    
-    #12 init_zakharov():
-    elif (o_func ==12):
-        for i in range(len(real_n)):
-            min_values.append(zakharov(real_n[i],dim))
-    
+            min_values.append(chosen_func(real_n[i][0],real_n[i][1]))
     else:
-        #10 init_six_hump_camel_back()
+        # The rest of the objective functions
         for i in range(len(real_n)):
-            min_values.append(six_hump_camel_back(real_n[0],real_n[1]))
+            min_values.append(chosen_func(real_n[i],dim))
     
-
     return min_values
+
 def vect_to_real(vect, min_v,max_v,sub_bits,prec):
     geneE=GeneEncoder(min_v,max_v,sub_bits,prec)
     real_num=[]
@@ -293,32 +212,31 @@ def vect_to_real(vect, min_v,max_v,sub_bits,prec):
         real_num.append(temp_l)
     return real_num
 def main():
-    #dim =8
+    discrete_mode = False
     max_iteration= 10000
     min_values=[]
     pool_s= int (input("Enter the Pool size: "))
-    print("1 init_ackley()")
-    print("2 init_de_jongs_sphere()")
-    print("3 init_easom()")
-    print("4 init_griewank()")
-    print("5 init_himmelblau()")
-    print("6 init_rastrigin()")
-    print("7 init_rosenbrock_var()")
-    print("8 init_rosenbrock_vec()")
-    print("9 init_schwefel()")
-    print("10 init_six_hump_camel_back()")
-    print("11 init_xin_she_yang()")
-    print("12 init_zakharov()")
+    names = ["init_ackley()", "init_de_jongs_sphere()", "init_easom()", "init_griewank()", "init_himmelblau()",
+            "init_rastrigin()", "init_rosenbrock_var()", "init_rosenbrock_vec()",
+            "init_schwefel()", "init_six_hump_camel_back()", "init_xin_she_yang()", "init_zakharov()",
+            "init f10()", "init f11()", "init f12()", "init f13()", "init f14()", "init f15()",
+            "init f16()", "init f17()", "init f18()", "init f19()", "init f20()", "init f21()",
+            "init f22()", "init f23()", "init f24()", "init f25()", "init f26()", "init f27()"]
+    for i in range(len(names)):
+        print("{} {}".format(i+1, names[i]))
+
     o_func= int(input("Enter the number of the objective function you want to use: "))
 
-    if (o_func == 5) or (o_func == 7):
-        # TODO: Determine what this should be after
+    if (o_func == 5) or (o_func == 7) or (o_func == 10):
         dim = 2
+    elif (o_func >= 13) and (o_func <= 30):
+        discrete_mode = True
+        dim = int( names[o_func - 1].lstrip("init f").rstrip("()") )
     else:
-        dim=int(input("Enter the Obective Functions Dimensions: "))
-
+        dim=int(input("Enter the Objective Functions Dimensions: "))
+    
     mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
-    # pool=initialize_strings_no_concat(dim,sub_bits,pool_s)
+
     pool = initialize_strings(dim,sub_bits,pool_s)
     print(pool)
     print()
@@ -336,16 +254,19 @@ def main():
         print("Iteration: {}, best_obj_value: {}".format(iteration, best_obj_value))
         new_pool=[]
 
-        if (o_func==10 or o_func==5 or o_func==7 ):
-            vect= string_to_vector(pool,2)
-            real_n=vect_to_real(vect,min_v,max_v,(sub_bits*dim)//2,prec)
+        real_n = []
+        if discrete_mode:
+            for i in range(pool_s):
+                real_n.append(binary_to_bipolar(pool[i]))
         else:
-            vect=string_to_vector(pool,dim)
-            real_n=vect_to_real(vect,min_v,max_v,sub_bits,prec)
+            if (o_func==10 or o_func==5 or o_func==7):
+                vect = string_to_vector(pool,2)
+                real_n = vect_to_real(vect,min_v,max_v,(sub_bits*dim)//2,prec)
+            else:
+                vect = string_to_vector(pool,dim)
+                real_n = vect_to_real(vect,min_v,max_v,sub_bits,prec)
         
-        # real_n = vect_to_real(pool, min_v, max_v, sub_bits, prec)
-
-        min_values=obective_function(o_func,real_n,dim)
+        min_values=objective_function(o_func,real_n,dim)
         current_min_value = min(min_values)
         min_obj_value_per_gen.append(current_min_value)
         avg_obj_value_per_gen.append(sum(min_values) / pool_s)
@@ -386,30 +307,12 @@ def main():
             new_pool.append(temp2)
         pool=new_pool
 
-        # for c in range(pool_s // 2):
-        #     a = random.randint(0,len(index_of_temp_pool)-1)
-        #     gene_1 = pool[index_of_temp_pool.pop(a)]
-
-        #     b = random.randint(0,len(index_of_temp_pool)-1)
-        #     gene_2 = pool[index_of_temp_pool.pop(b)]
-
-        #     temp1,temp2 = crossover_multivar(gene_1, gene_2, len(gene_1[0]))
-        #     new_pool.append(temp1)
-        #     new_pool.append(temp2)
-
-        # pool=new_pool
-
         # mutation
         for i in range(pool_s):
             prob = random.random()
             if (prob <= mut_p ):
                 temp=pool[i]
-                pool[i]=select_mut_index(temp,(sub_bits*dim),max_v,min_v,sub_bits,prec)
-
-        # for i in range(pool_s):
-        #     prob = random.random()
-        #     if (prob <= mut_p) :
-        #         pool[i] = mutate_multi_var(pool[i], max_v, min_v, sub_bits, prec)
+                pool[i]=select_mut_index(temp,(sub_bits*dim),max_v,min_v,sub_bits,prec, discrete_mode)
 
         iteration+=1 
 
