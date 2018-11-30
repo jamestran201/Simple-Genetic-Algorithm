@@ -12,53 +12,52 @@ def init_of(o_func):
     max_x=0
     max_y=0
     mut_p=0.06
-    if (o_func !=10): 
-        if (o_func ==1):
+    if (o_func ==1):
             #1 init_ackley():
-            min_v=-(5.12)
-            max_v=(5.12)
-        elif (o_func ==2):
+        min_v=-(5.12)
+        max_v=(5.12)
+    elif (o_func ==2):
             #2 init_de_jongs_sphere():
-            min_v=-(5.12)
-            max_v=(5.12)
+        min_v=-(5.12)
+        max_v=(5.12)
     
-        elif (o_func ==3):
+    elif (o_func ==3):
             #3 init_easom():
-            min_v=-2*math.pi
-            ax_v=2*math.pi
+        min_v=-2*math.pi
+        ax_v=2*math.pi
 
-        elif(o_func==4):
-            #4 init_griewank():
-            min_v=-600
-            max_v=600
-        elif (o_func ==5):
-            #5 init_himmelblau():
-            min_v=-3.8
-            max_v=3.6
-        elif (o_func ==6):
+    elif(o_func==4):
+           #4 init_griewank():
+        min_v=-600
+        max_v=600
+    elif (o_func ==5):
+        #5 init_himmelblau():
+        min_v=-3.8
+        max_v=3.6
+    elif (o_func ==6):
             #6 init_rastrigin():
-            min_v=-5.12
-            max_v=5.12
-        elif (o_func ==7):
+        min_v=-5.12
+        max_v=5.12
+    elif (o_func ==7):
             #7 init_rosenbrock_var():
-            min_v=0
-            max_v=2
-        elif (o_func ==8):
+        min_v=0
+        max_v=2
+    elif (o_func ==8):
             #8 init_rosenbrock_vec():
-            min_v=-2.048
-            max_v=2.048
-        elif (o_func ==9):
+        min_v=-2.048
+        max_v=2.048
+    elif (o_func ==9):
             #9 init_schwefel():
-            min_v=-65.536
-            max_v=65.536    
-        elif (o_func==11):
+        min_v=-65.536
+        max_v=65.536    
+    elif (o_func==11):
             #11 init_xin_she_yang():
-            min_v=-2*mathi.pi
-            max_v=2*math.pi    
+        min_v=-2*math.pi
+        max_v=2*math.pi    
         #12 init_zakharov():
-        elif (o_func ==12):
-            min_v=0
-            max_v=1
+    elif (o_func ==12):
+        min_v=0
+        max_v=1
     else:
         #10 init_six_hump_camel_back()
         min_y=-2
@@ -101,10 +100,10 @@ def initialize_strings(dimensions_v,bits,n):
   return string_pool
 
 def select_mut_index(string1,size,max_v,min_v,sub_bits,prec):
-    binary_g=GeneEncoder(min_v,max_v,sub_bits,prec)
+    binary_g=GeneEncoder(min_v,max_v,size,prec)
     val=binary_g.binary_to_gray(string1)
     turn = (random.randint(0,size-1))
-    print(turn,"turn")
+    
     bit=""
     if val[turn]=="1":
         bit="0"
@@ -116,19 +115,8 @@ def select_mut_index(string1,size,max_v,min_v,sub_bits,prec):
     else:
         new_s=val[0:turn]+bit+val[turn+1:]
     
-    final_r= binary_g.gray_to_binary(string1)
+    final_r= binary_g.gray_to_binary(new_s)
     return final_r
-def roulette(min_values):
-    total_sum=0
-    wieghts=[]
-    
-    for i in range(len(min_values)):
-        total_sum=total_sum+min_values[i]
-    
-    for i in range(len(min_values)):
-        temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
-        wieghts.append(temp)
-    return wieght
   def weights_tree(min_values):
     total_sum=0
     weights=[]
@@ -166,73 +154,61 @@ def string_to_vector(pool,dim):
    return vect    
 def obective_function(o_func,real_n,dim):
     min_values=[]
-    if (o_func !=10):
-        if (o_func ==1):
-            #1 init_ackley():
-            for i in range(len(real_n)):
-                
-                min_values.append(ackley(real_n[i],dim))
-
-        elif (o_func ==2):
-            #2 init_de_jongs_sphere():
-            for i in range(len(real_n)):
-                min_values.append(de_jongs_sphere(real_n[i],dim))  
-        elif (o_func ==3):
-            #3 init_easom():
-            for i in range(len(real_n)):
-                min_values.append(easom(real_n[i],dim))
-
-        elif(o_func ==4):
-            #4 init_griewank():
-            for i in range(len(real_n)):
-                min_values.append(griewank(real_n[i],dim))
-        elif (o_func ==6):
-            #6 init_rastrigin():
-            for i in range(len(real_n)):
-                min_values.append(rastrigin(real_n[i],dim))
-        #elif (o_func !=7):
-            #7 init_rosenbrock_var():
-            #x,y - two real-valued variables
-            #min at a,a^2 = 0
-            #def rosenbrock_var(x,y):
-            #a & b are parameters of the function
-            #a = 1
-            #b = 100
-            #result = (a - x)**2 + b*(y-x**2)**2
-            #return result
-            
-        elif (o_func ==8):
-            #8 init_rosenbrock_vec():
-            for i in range(len(real_n)):
-                min_values.append(rosenbrock_vec(real_n[i],dim))
-        elif (o_func ==9):
-            #9 init_schwefel():
-            for i in range(len(real_n)):
-                min_values.append(schwefel(real_n[i],dim))
-        elif (o_func ==11):
-            #11 init_xin_she_yang():
-            for i in range(len(real_n)):
-                min_values.append(xin_she_yang(real_n[i],dim))   
-        #12 init_zakharov():
-        elif (o_func ==12):
-            for i in range(len(real_n)):
-                min_values.append(zakharov(real_n[i],dim))
-    #elif (o_func !=5):
-        #5 init_himmelblau():
-        #x,y - two real-valued variables
-        #mins at:
-        #f(3.0,2.0)=0
-        #f(-2.805118,3.131312)=0
-        #f(-3.779310,-3.283186)=0
-        #f(3.584428,-1.848126)=0
-        #def himmelblau(x,y):
-    #    result = (x**2 + y - 11)**2 + (x + y**2-7)**2
-    #    return result
-    #    continue
-    #else:
-        #10 init_six_hump_camel_back()
     
-    #    continue
+    if (o_func ==1):
+         #1 init_ackley():
+        for i in range(len(real_n)):
+            min_values.append(ackley(real_n[i],dim))
+
+    elif (o_func ==2):
+            #2 init_de_jongs_sphere():
+        for i in range(len(real_n)):
+            min_values.append(de_jongs_sphere(real_n[i],dim))  
+    elif (o_func ==3):
+            #3 init_easom():
+        for i in range(len(real_n)):
+            min_values.append(easom(real_n[i],dim))
+
+    elif(o_func ==4):
+        #4 init_griewank():
+        for i in range(len(real_n)):
+            min_values.append(griewank(real_n[i],dim))
+    elif (o_func ==5):
+        #5 init_himmelblau():
+        for i in range(len(real_n)):
+            min_values.append(himmelblau(real_n[0],real_n[1]))
+    elif (o_func ==6):
+        #6 init_rastrigin():
+        for i in range(len(real_n)):
+            min_values.append(rastrigin(real_n[i],dim))
+    elif (o_func ==7):
+            #7 init_rosenbrock_var():
+        for i in range(len(real_n)):
+            min_values.append(rosenbrock_var(real_n[0],real_n[1]))
+            
+    elif (o_func ==8):
+        #8 init_rosenbrock_vec():
+        for i in range(len(real_n)):
+            min_values.append(rosenbrock_vec(real_n[i],dim))
+    elif (o_func ==9):
+            #9 init_schwefel():
+        for i in range(len(real_n)):
+            min_values.append(schwefel(real_n[i],dim))
+    elif (o_func ==11):
+            #11 init_xin_she_yang():
+        for i in range(len(real_n)):
+            min_values.append(xin_she_yang(real_n[i],dim))   
+    
+    #12 init_zakharov():
+    elif (o_func ==12):
+        for i in range(len(real_n)):
+            min_values.append(zakharov(real_n[i],dim))
+    
+    else:
+        #10 init_six_hump_camel_back()
+        for i in range(len(real_n)):
+            min_values.append(six_hump_camel_back(real_n[0],real_n[1]))
+    
 
     return min_values
   
@@ -249,6 +225,7 @@ def vect_to_real(vect, min_v,max_v,bits,prec):
 
 def main():
     #dim =8
+    max_iteration= 1000
     min_values=[]
     pool_s= int (input("Enter the Pool size:"))
     print("1 init_ackley()")
@@ -265,35 +242,54 @@ def main():
     print("12 init_zakharov()")
     o_func= int(input("Enter the number of the objective function you want to use:"))
     dim=int(input("Enter the Obective Functions Dimensions:"))
-
     mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
+    pool=initialize_strings(dim,sub_bits,pool_s)
+    test=True
+    no_change=0
+    iteration=0
+    while no_change<=3 and iteration <max_iteration:
 
-    pool=initialize_strings(dim,sub_bits,8)
-    print(pool)
+        new_pool=[]
+        if (o_func==10 or o_func==5 or o_func==7 ):
+            vect= string_to_vector(pool,2)
+            real_n=vect_to_real(vect,min_v,max_v,(sub_bits*dim)//2,prec)
+        else:
+            vect=string_to_vector(pool,dim)
+            real_n=vect_to_real(vect,min_v,max_v,sub_bits,prec)
+        
+        min_values=obective_function(o_func,real_n,dim)
+           
+        # calling function to do interval tree to find 
+        tree= weights_tree(min_values)    
+
+        index_of_temp_pool=[]
+        for i in range(pool_s):
+            index_s1= random.random()
+            get_index=list(tree.search(index_s1))[0]
+            index_of_temp_pool.append(get_index[2])
+        
+        # crossover 
+        for c in range(pool_s//2):
+            a= random.randint(0,len(index_of_temp_pool)-1)
+
+            string_1=pool[index_of_temp_pool.pop(a)]
+            b=random.randint(0,len(index_of_temp_pool)-1)
+            string_2=pool[index_of_temp_pool.pop(b)]
+
+            temp1,temp2=performCrossover(string_1,string_2, len(string_1))
+            new_pool.append(temp1)
+            new_pool.append(temp2)
+        pool=new_pool    
+        
+        # mutation
+        for i in range(pool_s):
+            
+            prob = random.random()
+            if (prob <= mut_p ):
+                temp=pool[i]
+                pool[i]=select_mut_index(temp,(sub_bits*dim),max_v,min_v,sub_bits,prec)
+        iteration+=1 
     
-    #no_change=0
-    #while no_change!=3:
-    vect=string_to_vector(pool,dim)
-    real_n=vect_to_real(vect,min_v,max_v,sub_bits,prec)
-    min_values=obective_function(o_func,real_n,dim)    
-    # calling function to do interval tree to find 
-    tree= weights_tree(min_values)    
-    # crossover 
-    for c in range(pool_s/2):
-        index_s1= random.random()
-        index_s2=random.random()
-        a = list(tree.search(index_s1))[0]
-        b= list(tree.search(index_s2))[0]
-        string_1=pool[a[2]]
-        string_2=pool[b[2]]
     
-        pool[a[2]],pool[b[2]]=performCrossover(string_1,string_2, len(string_1))
-    # mutation
-    for i in range(pool_s):
-        prob = random.random()
-        if (prob <= mut_p):
-            temp=pool[i]
-            pool[i]=select_mut_index(temp,sub_bits,max_v,min_v,(sub_bits*dim),prec)
-    print(pool)
     return 
 main()
