@@ -1,0 +1,2 @@
+matplotlib==2.2.3
+intervaltree==2.1.0
