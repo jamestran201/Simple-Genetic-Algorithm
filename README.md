@@ -14,4 +14,5 @@ Run the following command in the project folder to install dependencies. If your
 1. Go to the project directory and run the command: `bokeh serve --show live_plot.py`. 
 2. A new tab will pop up in the browser with an empty plot. 
 3. In a separate terminal, go to the project directory and follow the steps in the section above to run the algorithm.  
-4. The mean and minimum fitness values of each generation will be displayed on the plot as the algorithm runs.
+4. The mean and minimum fitness values of each generation will be displayed on the plot as the algorithm runs.  
+5. If you are running the algorithm multiple times, the browser tab has to be refreshed before each run for the new data to be displayed.  
