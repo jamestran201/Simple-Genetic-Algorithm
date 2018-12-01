@@ -6,7 +6,7 @@ Run the following command in the project folder to install dependencies. If your
 ```pip install -r dependencies.txt```
 
 ## Run the SGA
-1. In the project directory, run: `python SGA-functions.py`. Use `python3` instead of `python` if you have both Python 2 and Python3 installed. 
+1. In the project directory, run: `python SGA-functions.py`. Use `python3` instead of `python` if you have both Python 2 and Python 3 installed. 
 2. Follow the prompt and select the objective function to use and configurations.  
 3. Once the algorithm finished running, some graphs and a summary will be created and stored in the `results/` directory.  
 
