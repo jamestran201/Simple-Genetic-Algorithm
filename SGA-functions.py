@@ -6,12 +6,39 @@ from output import *
 from datetime import datetime
 import random
 import math 
-# stringOne and stringTwo are the strings that need to perform a crossover
-# how many bits the strings have
-# a random position is generated
-# crossover is performed at the position
-# returns the two new strings
+
 def init_of(o_func):
+    """
+    Given the type of objective function, return:
+        - the number of bits used to encode each variable in the function
+        - the minimum and maximum of the range of values
+
+    For objective functions 13 to 30, the number of bits used for encoding
+    will be 1 since the variables can only take -1 or 1 as value
+    
+    Parameters
+    ----------
+    o_func : int
+        the type of objective function
+    
+    Returns
+    -------
+    mut_p : float
+        mutation probability
+    sub_bits : int
+        number of bits used to encode each variable
+    prec : int
+        number of decimal points to keep for real values
+    min_v : float
+        the minimum in the range of possible values
+    max_v : float
+        the maximum in the range of values
+    min_y : float
+        the minimum in the range of possible values for the second variable in a 2D objective function
+    max_y : float
+        the maximum in the range of possible values for the second variable in a 2D objective function
+    """
+
     sub_bits=15
     prec=2
     min_v=0
@@ -77,6 +104,12 @@ def init_of(o_func):
         sub_bits = 1
 
     return mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y
+
+# stringOne and stringTwo are the strings that need to perform a crossover
+# how many bits the strings have
+# a random position is generated
+# crossover is performed at the position
+# returns the two new strings
 def performCrossover(stringOne, stringTwo, length):
   posToCross = random.randint(0,length-1)
 
@@ -105,6 +138,31 @@ def initialize_strings(dimensions_v,bits,n):
     return string_pool
 
 def select_mut_index(string1,size,max_v,min_v,sub_bits,prec,discrete_mode):
+    """
+    Randomly flip a bit in the given binary string
+
+    Parameters
+    ----------
+    string1 : str
+        a binary string
+    size : int
+        the length of the binary string
+    max_v : float
+        the maximum value in the range of values
+    min_v : float
+        the minimum value in the range of values
+    sub_bits : int
+        number of bits used for encoding
+    prec : int
+        number of digits after decimal point to keep
+    discrete_mode : boolean
+        whether the possible values can only be integers (this is True for OF's 13 to 30)
+    
+    Returns
+    -------
+    the original string with a bit flipped in a random position
+    """
+
     if not discrete_mode:
         binary_g=GeneEncoder(min_v,max_v,size,prec)
         val=binary_g.binary_to_gray(string1)
@@ -132,6 +190,19 @@ def select_mut_index(string1,size,max_v,min_v,sub_bits,prec,discrete_mode):
     return final_r
 
 def weights_tree(min_values):
+    """
+    Given the fitness values, calculate the probabilities of reproduction for each gene
+    and return the IntervalTree that contains all of the probability intervals
+
+    Parameters
+    ----------
+    min_values : list
+        The list of fitness values
+    
+    Returns
+    An IntervalTree that contains all of the probability intervals
+    """
+
     total_sum=0
     weights=[]
     tree = IntervalTree()
@@ -167,6 +238,22 @@ def weights_tree(min_values):
     return tree
 
 def string_to_vector(pool,dim):
+    """
+    Given a list of binary string, split each string into a list of substrings,
+    where each substring is the binary encoding of a variable in the OF
+
+    Parameters
+    ----------
+    pool : list
+        the list of all genes in the gene pool
+    dim : int
+        the dimension of the OF
+    
+    Returns
+    -------
+    A 2D list where each sub-list contains the binary encoding of a variable in the OF
+    """
+
     vect=[]
     for i in pool:
         start=0
@@ -180,7 +267,25 @@ def string_to_vector(pool,dim):
         vect.append(temp_l)
     
     return vect     
+
 def objective_function(o_func,real_n,dim):
+    """
+    Calculate the fitness values using the given objective function
+
+    Parameters
+    ----------
+    o_func : int
+        the type of objective function to use
+    real_n : list
+        the values of each variable as real numbers
+    dim : int
+        the dimension of the function
+    
+    Returns
+    -------
+    A list of the fitness values
+    """
+
     func_ptr = [ackley, de_jongs_sphere, easom, griewank, himmelblau, rastrigin, rosenbrock_var, rosenbrock_vec,
                 schwefel, six_hump_camel_back, xin_she_yang, zakharov, f10, f11, f12, f13, f14, f15, f16, f17,
                 f18, f19, f20, f21, f22, f23, f24, f25, f26, f27]
@@ -203,6 +308,29 @@ def objective_function(o_func,real_n,dim):
     return min_values
 
 def vect_to_real(vect, min_v,max_v,sub_bits,prec):
+    """
+    Given a 2D list where each sublist contains binary encodings of the variables
+    for each gene, convert the binary enconding into real values
+
+    Parameters
+    ----------
+    vect : 2D-list
+        the 2D-list of binary encodings
+    min_v : float
+        the minimum value in the range of values
+    max_v : float
+        the maximum value in the range of values
+    sub_bits : int
+        number of bits used for the encoding
+    prec : int
+        number of decimal points to keep
+    
+    Returns
+    -------
+    A 2D list where each sub-list contains the real values corresponding to each
+    binary string
+    """
+
     geneE=GeneEncoder(min_v,max_v,sub_bits,prec)
     real_num=[]
     for j in vect:
@@ -211,6 +339,7 @@ def vect_to_real(vect, min_v,max_v,sub_bits,prec):
             temp_l.append(geneE.binary_to_real(x))
         real_num.append(temp_l)
     return real_num
+    
 def main():
     discrete_mode = False
     max_iteration= 10000

@@ -159,6 +159,10 @@ class GeneEncoder:
         return value
 
 def binary_to_bipolar(input_str):
+    """
+    Given a binary string, convert it to either -1 or 1
+    """
+    
     result=[]
     for s in input_str:
         if s == "0":

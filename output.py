@@ -12,6 +12,30 @@ TEST_FUNCTIONS = [
 ]
 
 def plot_line_graph(x, y, xlabel, ylabel, plot_title, timestamp):
+    """
+    Create a line plot, create a new directory in results/ folder based on timestamp
+    and save the plot in that directory
+
+    Parameters
+    ----------
+    x : list
+        The values for the x-axis
+    y : list
+        The values of the y-axis
+    xlabel : str
+        The label for the x-axis
+    ylabel : str
+        The label for the y-axis
+    plot_title : str
+        The title of the plot
+    timestamp : datetime
+        Create a directory using this timestamp to store the saved file
+    
+    Returns
+    -------
+    Display the graph on the screen and save it to disk
+    """
+
     plt.plot(x, y)
     plt.title(plot_title)
     plt.xlabel(xlabel)
@@ -31,18 +55,28 @@ def plot_line_graph(x, y, xlabel, ylabel, plot_title, timestamp):
 def save_result_to_file(result_dict, timestamp):
     """
     Save the results to a text file.
-    The input "result_dict" is a dictionary that must include all fields below:
-    {
-        "obj_func" : int,
-        "obj_dimen" : int,
-        "pool_size" : int,
-        "mutate_prob" : float,
-        "max_iter" : int,
-        "best_obj_value" : float,
-        "best_gene": list,
-        "stop_iter" : int,
-        "stop_reason" : str
-    }
+
+    Parameters
+    ----------
+    result_dict : dict
+        A dictionary that must contain all fields below
+            {
+                "obj_func" : int,
+                "obj_dimen" : int,
+                "pool_size" : int,
+                "mutate_prob" : float,
+                "max_iter" : int,
+                "best_obj_value" : float,
+                "best_gene": list,
+                "stop_iter" : int,
+                "stop_reason" : str
+            }
+    timestamp : datetime
+        Create a directory using this timestamp to store the saved file
+    
+    Returns
+    -------
+    Save the results to the file "summary.txt" in the folder marked by timestamp
     """
 
     output_dir = RESULTS_DIR + timestamp.strftime("%Y%m%d-%H%M%S")
