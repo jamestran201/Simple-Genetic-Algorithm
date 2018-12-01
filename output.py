@@ -66,6 +66,7 @@ def save_result_to_file(result_dict, timestamp):
                 "pool_size" : int,
                 "mutate_prob" : float,
                 "max_iter" : int,
+                "use_softmax" : boolean,
                 "best_obj_value" : float,
                 "best_gene": list,
                 "stop_iter" : int,
@@ -90,6 +91,7 @@ def save_result_to_file(result_dict, timestamp):
         f.write("Dimension of objective function: {}\n".format(result_dict["obj_dimen"]))
         f.write("Pool size: {}\n".format(result_dict["pool_size"]))
         f.write("Mutation probability: {}\n".format(result_dict["mutate_prob"]))
+        f.write("Used softmax function: {}\n".format(result_dict["use_softmax"]))
         f.write("Maximum number of iterations: {}\n".format(result_dict["max_iter"]))
         f.write("Stopped at iteration: {}\n".format(result_dict["stop_iter"]))
         f.write("Reason for stopping: {}\n".format(result_dict["stop_reason"]))

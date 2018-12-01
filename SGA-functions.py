@@ -7,6 +7,11 @@ from datetime import datetime
 import random
 import math 
 
+DEFAULT_MUT_P = 0.001
+DEFAULT_MAX_ITERATION = 10000
+DEFAULT_THRESHOLD = 0.0001
+DEFAULT_MAX_NO_CHANGE = 100
+
 def init_of(o_func):
     """
     Given the type of objective function, return:
@@ -23,8 +28,6 @@ def init_of(o_func):
     
     Returns
     -------
-    mut_p : float
-        mutation probability
     sub_bits : int
         number of bits used to encode each variable
     prec : int
@@ -47,7 +50,7 @@ def init_of(o_func):
     min_y=0
     max_x=0
     max_y=0
-    mut_p=0.001
+
     if (o_func ==1):
         #1 init_ackley():
         min_v=-(5.12)
@@ -103,7 +106,7 @@ def init_of(o_func):
     elif (o_func >= 13) and (o_func <= 30):
         sub_bits = 1
 
-    return mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y
+    return sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y
 
 # stringOne and stringTwo are the strings that need to perform a crossover
 # how many bits the strings have
@@ -344,10 +347,11 @@ def vect_to_real(vect, min_v,max_v,sub_bits,prec):
         real_num.append(temp_l)
     return real_num
     
-def main():
-    discrete_mode = False
-    max_iteration= 10000
-    min_values=[]
+def get_user_input():
+    """
+    Get run configurations from the user. Returns a dictionary that contains all of the configurations
+    """
+
     pool_s= int (input("Enter the Pool size: "))
     names = ["init_ackley()", "init_de_jongs_sphere()", "init_easom()", "init_griewank()", "init_himmelblau()",
             "init_rastrigin()", "init_rosenbrock_var()", "init_rosenbrock_vec()",
@@ -360,6 +364,7 @@ def main():
 
     o_func= int(input("Enter the number of the objective function you want to use: "))
 
+    discrete_mode = False
     if (o_func == 5) or (o_func == 7) or (o_func == 10):
         dim = 2
     elif (o_func >= 13) and (o_func <= 30):
@@ -368,9 +373,63 @@ def main():
     else:
         dim=int(input("Enter the Objective Functions Dimensions: "))
 
-    use_softmax = bool(input("Use softmax function to calculate survival probability (False by default): "))
+    mut_p = input("Enter mutation probability (default: 0.001): ")
+    if mut_p == "":
+        mut_p = DEFAULT_MUT_P
+    else:
+        mut_p = float(mut_p)
+        if mut_p < 0 or mut_p > 1:
+            print("Mutation probability should be between 0 and 1")
+            exit(1)
+
+    max_iteration = input("Enter the maximum number of iterations to run (default: 10000): ")
+    if max_iteration == "":
+        max_iteration = DEFAULT_MAX_ITERATION
+    else:
+        max_iteration = int(max_iteration)
+        if max_iteration <= 0:
+            print("The number of iterations should be greater than 0")
+            exit(1)
     
-    mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
+    max_no_change = input("Enter after how many iterations the algorithm should stop when"
+                        + " the fitness value does not change much (default: 100): ")
+    if max_no_change == "":
+        max_no_change = DEFAULT_MAX_NO_CHANGE
+    else:
+        max_no_change = int(max_no_change)
+        if max_no_change <= 0:
+            print("The number of iterations for early stopping should be greater than 0")
+            exit(1)
+
+    use_softmax = bool(input("Use softmax function to calculate survival probability (default: False): "))
+
+    configurations = {
+        "pool_s": pool_s,
+        "o_func": o_func,
+        "discrete_mode": discrete_mode,
+        "dim": dim,
+        "mut_p": mut_p,
+        "max_iteration": max_iteration,
+        "max_no_change": max_no_change,
+        "use_softmax": use_softmax
+    }
+
+    return configurations
+
+def main():
+    configurations = get_user_input()
+    pool_s = configurations["pool_s"]
+    o_func = configurations["o_func"]
+    discrete_mode = configurations["discrete_mode"]
+    dim = configurations["dim"]
+    mut_p = configurations["mut_p"]
+    max_iteration = configurations["max_iteration"]
+    max_no_change = configurations["max_no_change"]
+    use_softmax = configurations["use_softmax"]
+    
+    min_values=[]
+
+    sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
 
     pool = initialize_strings(dim,sub_bits,pool_s)
     print(pool)
@@ -380,8 +439,6 @@ def main():
     best_gene = None
     avg_obj_value_per_gen = []
     min_obj_value_per_gen = []
-    threshold = 0.0001
-    max_no_change = 100
     no_change=0
     iteration=0
     print("Max iteration: {}".format(max_iteration))
@@ -412,7 +469,7 @@ def main():
             best_obj_value = current_min_value
             best_val_index = min_values.index(best_obj_value)
             best_gene = real_n[best_val_index]
-        elif abs(best_obj_value - current_min_value) < threshold or current_min_value > best_obj_value:
+        elif abs(best_obj_value - current_min_value) < DEFAULT_THRESHOLD or current_min_value > best_obj_value:
             no_change += 1
         else:
             best_obj_value = current_min_value
@@ -486,6 +543,7 @@ def main():
         "pool_size" : pool_s,
         "mutate_prob" : mut_p,
         "max_iter" : max_iteration,
+        "use_softmax": use_softmax,
         "best_obj_value" : best_obj_value,
         "best_gene": best_gene,
         "stop_iter" : iteration,
