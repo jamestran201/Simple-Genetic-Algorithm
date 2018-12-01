@@ -189,7 +189,7 @@ def select_mut_index(string1,size,max_v,min_v,sub_bits,prec,discrete_mode):
 
     return final_r
 
-def weights_tree(min_values):
+def weights_tree(min_values, use_softmax = False):
     """
     Given the fitness values, calculate the probabilities of reproduction for each gene
     and return the IntervalTree that contains all of the probability intervals
@@ -198,8 +198,11 @@ def weights_tree(min_values):
     ----------
     min_values : list
         The list of fitness values
-    
+    use_softmax : boolean (default is False)
+        Whether to use the softmax function to assign survival probabilities
+
     Returns
+    -------
     An IntervalTree that contains all of the probability intervals
     """
 
@@ -207,27 +210,28 @@ def weights_tree(min_values):
     weights=[]
     tree = IntervalTree()
 
-    # for i in range(len(min_values)):
-    #     total_sum=total_sum+min_values[i]
-    
-    # for i in range(len(min_values)):
-    #     temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
-    #     weights.append(temp)
+    if (not use_softmax):
+        for i in range(len(min_values)):
+            total_sum=total_sum+min_values[i]
+        
+        for i in range(len(min_values)):
+            temp=( (total_sum-min_values[i])/total_sum)/(len(min_values)-1)
+            weights.append(temp)
+    else:
+        shifted_values = []
+        min_val = min(min_values)
+        for val in min_values:
+            shifted_values.append(val - min_val)
 
-    shifted_values = []
-    max_val = min(min_values)
-    for val in min_values:
-        shifted_values.append(val - max_val)
+        for i in range(len(shifted_values)):
+            total_sum = total_sum + math.exp(-1 * shifted_values[i])
+        
+        for i in range(len(shifted_values)):
+            temp = math.exp(-1 * shifted_values[i]) / total_sum
+            weights.append(temp)
 
-    for i in range(len(shifted_values)):
-        total_sum = total_sum + math.exp(-1 * shifted_values[i])
-    
-    for i in range(len(shifted_values)):
-        temp = math.exp(-1 * shifted_values[i]) / total_sum
-        weights.append(temp)
-
-    start= 0
-    end =0
+    start = 0
+    end = 0
     for i in range(len(min_values)):
         if weights[i] - 0 > 0.0000000001:
             end = start+weights[i]
@@ -363,6 +367,8 @@ def main():
         dim = int( names[o_func - 1].lstrip("init f").rstrip("()") )
     else:
         dim=int(input("Enter the Objective Functions Dimensions: "))
+
+    use_softmax = bool(input("Use softmax function to calculate survival probability (False by default): "))
     
     mut_p,sub_bits,prec,min_v,max_v,min_x,max_x,min_y,max_y = init_of(o_func)
 
@@ -415,7 +421,7 @@ def main():
             no_change = 0
 
         # calling function to do interval tree to find 
-        tree= weights_tree(min_values)    
+        tree= weights_tree(min_values, use_softmax)    
 
         index_of_temp_pool=[]
         for i in range(pool_s):
