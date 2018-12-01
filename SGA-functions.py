@@ -6,6 +6,7 @@ from output import *
 from datetime import datetime
 import random
 import math 
+import os
 
 DEFAULT_MUT_P = 0.001
 DEFAULT_MAX_ITERATION = 10000
@@ -435,6 +436,14 @@ def main():
     print(pool)
     print()
     
+    # Attempt to open file for live plotting
+    live_f = None
+    if os.path.isfile('./tmp_data.txt'):
+        try:
+            live_f = open("tmp_data.txt", "w", buffering=1)
+        except:
+            live_f = None
+
     best_obj_value = None
     best_gene = None
     avg_obj_value_per_gen = []
@@ -460,10 +469,14 @@ def main():
         
         min_values=objective_function(o_func,real_n,dim)
         current_min_value = min(min_values)
+        avg_fitness_value = sum(min_values) / pool_s
         min_obj_value_per_gen.append(current_min_value)
-        avg_obj_value_per_gen.append(sum(min_values) / pool_s)
+        avg_obj_value_per_gen.append(avg_fitness_value)
 
-        print("Iteration min value: {}".format(current_min_value))
+        if live_f is not None:
+            live_f.write("{},{:.3f},{:.3f}\n".format(iteration, avg_fitness_value, current_min_value))
+
+        # print("Iteration min value: {}".format(current_min_value))
 
         if best_obj_value is None:
             best_obj_value = current_min_value
@@ -550,6 +563,9 @@ def main():
         "stop_reason" : stop_reason
     }
     save_result_to_file(result_dict, current_time)
+
+    if live_f is not None:
+        live_f.close()
 
     return 
 

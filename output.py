@@ -49,9 +49,8 @@ def plot_line_graph(x, y, xlabel, ylabel, plot_title, timestamp):
 
     outfile = plot_title.replace(" ", "-").replace("(","").replace(")","") + ".png"
     plt.savefig(output_dir + "/" + outfile)
+    plt.clf()
     
-    plt.show()
-
 def save_result_to_file(result_dict, timestamp):
     """
     Save the results to a text file.
